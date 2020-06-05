@@ -1,4 +1,4 @@
-#ifndef __SOLVER_STRUCT_H__ 
+#ifndef __SOLVER_STRUCT_H__
 #define __SOLVER_STRUCT_H__
 #include<stdint.h>
 #include"cube_structures.h"
@@ -40,6 +40,7 @@ typedef struct __search_node__{
 #define PHASE_2_CUBE_QUEUE_SIZE        (0x06000000)
 #define PHASE_1_SEARCH_CHUNK_SIZE      (0x00020000)
 #define PHASE_2_SEARCH_CHUNK_SIZE_CPU  (0x00010000)
+#define PHASE_2_SEARCH_CHUNK_SIZE_GPU  (0x00040000)
 #define PHASE_2_SEARCH_CHUNK_SIZE_HOST (0x00000800)
 #define PHASE2_SEARCH_DEPTH 11
 #define BLOCK_DIM (128)
