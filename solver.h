@@ -10,6 +10,7 @@
 
 #define N_THREADS 16
 
+#define NO_STATUS_PRINT 1
 
 /* もろもろのテーブルを初期化．solve関数を呼ぶ前に1度は呼ぶ */
 void init_solver();

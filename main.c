@@ -37,10 +37,10 @@ coord_cube random_cube_coord(int32_t shuffle_len, int8_t *shuffle){
 }
 
 static
-void print_move(int8_t result[20], int8_t solution_len){
+void print_move(int8_t *moves, int32_t len){
   int32_t i;
-  for (i = 0; i < solution_len; i++){
-    printf("%s ", MOV_STR[result[i]]);
+  for (i = 0; i < len; i++){
+    printf("%s ", MOV_STR[moves[i]]);
   }
   printf("\n");
 }
@@ -101,8 +101,10 @@ coord_cube super_flip(int32_t shuffle_len,int8_t* shuffle_log){
   int main(){
     coord_cube coord;
     int32_t shuffle_len;
+    int32_t shuffle_len_max = 200;
+    int32_t shuffle_len_min = 100;
     int8_t result[21];
-    int8_t shuffle[100];
+    int8_t shuffle[256];
     double time_sum[21] = {0};
     double time;
     int32_t solution_len_distribution[21] = {0};
@@ -110,48 +112,60 @@ coord_cube super_flip(int32_t shuffle_len,int8_t* shuffle_log){
     int32_t ill = 0;
     int32_t i;
     int32_t count = 0;
+    double max_solved_time = 0;
     init_solver();/* 最初に呼ぶ．*/
     srand((unsigned int) omp_get_wtime());
-    for (shuffle_len = 100; shuffle_len <= 100; shuffle_len++){
-      for (i = 0; i < 10000; i++){
-        int32_t solution_len,  ii;
-        coord = random_cube_coord(shuffle_len, shuffle);
-        //coord = super_flip(shuffle_len, shuffle);
-        //print_move(shuffle, shuffle_len);/* シャッフル手順を印字 */
-        t1 = omp_get_wtime();
-        solution_len = solve(&coord, result);
-        t2 = omp_get_wtime();
-        if (solution_len != -1){
-          count++;
-          printf("solved(%d %d)\n",count, i);
-          print_move(result, solution_len);/* 解を印字 */
-          if(!verify_solution(shuffle, shuffle_len,result, solution_len)){
-            printf("illegal solution \n");
-            ill ++;
-            //return 1;
-          }
+    for (i = 0; i < 10000; i++){
+      int32_t solution_len,  ii;
+      shuffle_len = shuffle_len_min + (rand() % (shuffle_len_max + 1 - shuffle_len_min));
+      coord = random_cube_coord(shuffle_len, shuffle);
+      //coord = super_flip(shuffle_len = 20, shuffle);
+      printf("shuffle moves = ");
+      print_move(shuffle, shuffle_len);/* シャッフル手順を印字 */
+      t1 = omp_get_wtime();
+      solution_len = solve(&coord, result);
+      t2 = omp_get_wtime();
+      if (solution_len != -1){
+        count++;
+        printf("solved(%d %d)\n",count, i);
+        printf("solved moves = ");
+        print_move(result, solution_len);/* 解を印字 */
+        if(!verify_solution(shuffle, shuffle_len,result, solution_len)){
+          printf("illegal solution \n");
+          ill ++;
+          //return 1;
         }
-        if (solution_len > shuffle_len){
-          printf("illegal solution\n");
-          return 1;
-        }
-        time = t2 - t1;
-        time_sum[solution_len] += time;
-        solution_len_distribution[solution_len]++;
-        printf("solution_len = %d, time = %f\n", solution_len, time);/* 解の長さと探索時間を印字 */
-        
-        printf("solution_len , count , avg_time   ill = %d\n",ill);
-        for (ii = 0; ii < 21;ii++){
-          printf("%2d , %5d , %f\n", ii, solution_len_distribution[ii], solution_len_distribution[ii] ? time_sum[ii] / solution_len_distribution[ii] : 0);
-        }
-        
       }
+      if (solution_len > shuffle_len){
+        printf("illegal solution\n");
+        return 1;
+      }
+      time = t2 - t1;
+      if (max_solved_time < time){
+        max_solved_time = time;
+      }
+      time_sum[solution_len] += time;
+      solution_len_distribution[solution_len]++;
+      printf("solution_len = %d, time = %f\n", solution_len, time);/* 解の長さと探索時間を印字 */
+        
+      printf("solution_len , count , avg_time   ill = %d\n",ill);
+      double all_time_sum = 0;
+      for (ii = 0; ii < 21;ii++){
+        all_time_sum += time_sum[ii];
+        printf("%2d , %5d , %f\n", ii, solution_len_distribution[ii], solution_len_distribution[ii] ? time_sum[ii] / solution_len_distribution[ii] : 0);
+      }
+      printf("all avg time = %f / count = %d\n", all_time_sum / count, count);
+      printf("max_solved_time = %f\n", max_solved_time);
     }
     /* 解の長さの分布と解の長さ毎の平均処理時間を印字 */
     printf("solution_len , count , avg_time\n");
+    double all_time_sum = 0;
     for (i = 0; i < 21;i++){
+      all_time_sum += time_sum[i];
       printf("%2d , %5d , %f\n", i, solution_len_distribution[i], solution_len_distribution[i] ? time_sum[i] / solution_len_distribution[i] : 0);
     }
+    printf("all avg time = %f / count = %d\n", all_time_sum / count, count);
+    printf("max_solved_time = %f\n", max_solved_time);    
     return 0;
   }
   

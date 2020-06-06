@@ -623,7 +623,9 @@ int32_t two_phase_search_tree(coord_cube_ptr cube, search_node_cube_ptr cube_nod
       }
       if(phase1_finished){
         t2 = omp_get_wtime();
+#if(NO_STATUS_PRINT == 0)
         printf("==================== phase1 finished =====================\n");
+#endif
       }
     }
     if(cpu_search_flag){
@@ -633,13 +635,16 @@ int32_t two_phase_search_tree(coord_cube_ptr cube, search_node_cube_ptr cube_nod
       cpu_count += entry;
       ret = search_tree_phase2_1thread(result, &host_chunk);
       if(ret){
+#if(NO_STATUS_PRINT == 0)
         printf("solved host\n");
+#endif
         goto SYNC;
       }
-
+#if(NO_STATUS_PRINT == 0)
       rate = cpu_count?(double)gpu_count/cpu_count:0;
       printf("  phase2 enqueued on CPU     entry = %6d remain entry = %10d   GPU / CPU rate = %.4f depth = %d ############\n",
                   entry , queue_entry(&queue), rate, search_depth);
+#endif
     }
     ///////////////////////////////////////////////////////////////
     for(i = 0 ; i < N_STREAM; i ++){
@@ -651,8 +656,10 @@ int32_t two_phase_search_tree(coord_cube_ptr cube, search_node_cube_ptr cube_nod
         search_tree_phase2_cuda_async(&gpu_chunk[i], i);
         enq_flag [i] = 1;
         rate = cpu_count?(double)gpu_count/cpu_count:0;
+#if(NO_STATUS_PRINT == 0)
         printf("  phase2 enqueued on GPU(%2d) entry = %6d remain entry = %10d   GPU / CPU rate = %.4f depth = %d\n",
               i, entry,queue_entry(&queue), rate, search_depth);
+#endif
       }
     }
     get_stream_state(&state);
@@ -660,7 +667,9 @@ int32_t two_phase_search_tree(coord_cube_ptr cube, search_node_cube_ptr cube_nod
       if(state.stream_state_array[i] == STREAM_STATE_READY){
         if(enq_flag [i] && !ret ){
           if (get_search_result(result, i)){
-            printf("solved gpu %d\n",i);
+#if(NO_STATUS_PRINT == 0)
+            printf("solved GPU %d\n",i);
+#endif
             ret = 1;
             goto SYNC;
           }
@@ -679,8 +688,10 @@ int32_t two_phase_search_tree(coord_cube_ptr cube, search_node_cube_ptr cube_nod
         search_tree_phase2_cpu_async(&cpu_chunk[i], i);
         enq_flag_cpu [i] = 1;
         rate = cpu_count?(double)gpu_count/cpu_count:0;
+#if(NO_STATUS_PRINT == 0)
         printf("  phase2 enqueued on CPU(%2d) entry = %6d remain entry = %10d   GPU / CPU rate = %.4f depth = %d\n",
                i,entry,queue_entry(&queue), rate, search_depth);
+#endif
       }
     }
 
@@ -689,7 +700,9 @@ int32_t two_phase_search_tree(coord_cube_ptr cube, search_node_cube_ptr cube_nod
       if(cpu_state.stream_state_array[i] == STREAM_STATE_READY){
         if(enq_flag_cpu [i] && !ret ){
           if (get_search_result_cpu(result, i)){
-            printf("solved cpu %d\n",i);
+#if(NO_STATUS_PRINT == 0)
+            printf("solved CPU %d\n",i);
+#endif
             ret = 1;
             goto SYNC;
           }
@@ -706,7 +719,9 @@ SYNC:;
   for(i = 0 ; i < N_STREAM; i ++){
     if(enq_flag [i] && !ret){
       if (get_search_result(result, i)){
+#if(NO_STATUS_PRINT == 0)
         printf("solved GPU %d\n",i);
+#endif
         ret = 1;
       }
     }
@@ -716,13 +731,14 @@ SYNC:;
   for(i = 0 ; i < N_CPU_STREAM; i ++){
     if(enq_flag_cpu [i] && !ret){
       if (get_search_result_cpu(result, i)){
+#if(NO_STATUS_PRINT == 0)
         printf("solved CPU %d\n",i);
+#endif
         ret = 1;
       }
     }
   }
   stop_phase2_worker();
-
 #endif
   t3 = omp_get_wtime();
 
@@ -734,12 +750,14 @@ SYNC:;
     free_chunk(&cpu_chunk[i]);
   }
   free_chunk(&host_chunk);
+#if(NO_STATUS_PRINT == 0)
   printf("depth %d , GPU : CPU rate = %.4f : %.4f cpu=%lld , gpu = %lld , phase2sum = %lld\n",search_depth, (double)gpu_count/(cpu_count + gpu_count),(double)cpu_count/(cpu_count + gpu_count), cpu_count, gpu_count, cpu_count + gpu_count);
 
   printf("phase1 : %fsec\n", t2 - t1);
   //printf("phase2 : %fsec\n", t3 - t2);
   printf("phase2 : %fsec\n", t3 - t1);
   printf("===================== search finished. depth = %d =====================\n", search_depth);
+#endif
   return ret;
 }
 #endif
@@ -873,6 +891,9 @@ int32_t solve(coord_cube_ptr cube, int8_t *result){
   }
   convert_coord_to_search_node(cube, &cube_node);
   for (i = 1; i <= 20; i++){
+#if(NO_STATUS_PRINT)
+    printf("search_depth = %d\n", i);
+#endif
     if (i > TWO_PHASE_SEARCH_SWITCH_DEPTH)
     re = two_phase_search_tree(cube, &cube_node, i, result);
     else
