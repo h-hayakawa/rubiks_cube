@@ -2,14 +2,15 @@
 マルチスレッドやらGPUやらに負荷をかけるためのオモチャ。 
 
 ソルバーとしては出回ってるフリーソフトでもっと優秀なのがある。 
+
+動作環境：Linux + CUDA 
+
+
+solver.h：実行時に使うCPUスレッド数の指定（マルチGPUなどでGPUが遊んでしまう場合はここを物理コア数を上限に設定する） 
  
-GPU用はこのcommitをした段階で実験環境が無かったのでCPU用のみ 
+cuda_solver.h：GPUの数を設定する。単純にnVidiaのハード数を0から採番するので、使うハードを明示的に指定したい場合はソース改造してね。 
  
-前提：pthreadが動く環境 
+solver_struct.h：実行時のもろもろパラメータを入れてるけど、作者本人かソースをひっくり返した人しかわからないと思う。 
  
-windowsならMinGW-w64でposix threadを指定してインストール 
- 
-solver.hで使うthread数を指定 
- 
- 
-gcc *.c -fopenmp -Ofast -mavx2
+Makefile：よしなに設定してね。arch smとかは搭載GPUの世代に合わせて設定 
+

@@ -19,8 +19,8 @@ LDFLAGS = ${CFLAGS}
 M_ARCH = $(shell uname -m)
 
 # for Device Code
-CUDA_PATH = /usr/local/cuda-7.5
-HELPER_PATH = /usr/local/cuda-7.5/samples/common/inc
+CUDA_PATH = /usr/local/cuda
+HELPER_PATH = /usr/local/cuda/samples/common/inc
 ifeq ($(M_ARCH), x86_64)
 LDFLAGS += -L${CUDA_PATH}/lib64
 LDFLAGS += -lcudart
@@ -32,7 +32,7 @@ endif
 NFLAG += ${NVCC_FLAGS}
 NFLAG += -I${CUDA_PATH}/include
 NFLAG += -I${HELPER_PATH}/
-NFLAG += -arch sm_30
+NFLAG += -arch sm_75
 #NFLAG += -maxrregcount 32
 
 all : ${PROG}

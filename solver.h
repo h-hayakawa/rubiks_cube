@@ -8,7 +8,7 @@
 #include"search_node_level_move.h"
 
 
-#define N_THREADS 32
+#define N_THREADS 16
 
 
 /* もろもろのテーブルを初期化．solve関数を呼ぶ前に1度は呼ぶ */
