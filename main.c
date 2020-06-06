@@ -2,6 +2,7 @@
 #include<stdlib.h>
 #include<stdint.h>
 #include<omp.h>
+#include<time.h>
 #include"cube_structures.h"
 #include"coordinate_level_move.h"
 #include"solver.h"
@@ -109,8 +110,8 @@ coord_cube super_flip(int32_t shuffle_len,int8_t* shuffle_log){
     int32_t ill = 0;
     int32_t i;
     int32_t count = 0;
-    init_solver();/*最初に呼ぶ．*/
-    srand(0);
+    init_solver();/* 最初に呼ぶ．*/
+    srand((unsigned int) omp_get_wtime());
     for (shuffle_len = 100; shuffle_len <= 100; shuffle_len++){
       for (i = 0; i < 10000; i++){
         int32_t solution_len,  ii;
