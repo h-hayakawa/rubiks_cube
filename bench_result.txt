@@ -26,5 +26,5 @@ solution_len , count , avg_time
 
 super_flip
 solution_len , count , avg_time
-20 ,     1 , 522.610024
+20 ,     1 , 515.953730
 
