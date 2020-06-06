@@ -112,7 +112,7 @@ coord_cube super_flip(int32_t shuffle_len,int8_t* shuffle_log){
     init_solver();/*最初に呼ぶ．*/
     srand(0);
     for (shuffle_len = 100; shuffle_len <= 100; shuffle_len++){
-      for (i = 0; i < 1000000; i++){
+      for (i = 0; i < 10000; i++){
         int32_t solution_len,  ii;
         coord = random_cube_coord(shuffle_len, shuffle);
         //coord = super_flip(shuffle_len, shuffle);

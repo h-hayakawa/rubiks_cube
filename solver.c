@@ -571,7 +571,9 @@ int32_t two_phase_search_tree(coord_cube_ptr cube, search_node_cube_ptr cube_nod
   cpu_stream_state cpu_state;
   int32_t i;
   int32_t enq_flag[N_STREAM] = {0};
+#if (N_CPU_STREAM)
   int32_t enq_flag_cpu[N_CPU_STREAM] = {0};
+#endif
   int32_t cpu_search_flag;
   int64_t cpu_count = 0, gpu_count = 0;
   double rate;
@@ -667,6 +669,7 @@ int32_t two_phase_search_tree(coord_cube_ptr cube, search_node_cube_ptr cube_nod
       }
     }
     ///////////////////////////////////////////////////////////////
+#if(N_CPU_STREAM)
     for(i = 0 ; i < N_CPU_STREAM; i ++){
       if(cpu_state.stream_state_array[i] == STREAM_STATE_READY && queue_entry(&queue)){
         int32_t entry;
@@ -680,6 +683,7 @@ int32_t two_phase_search_tree(coord_cube_ptr cube, search_node_cube_ptr cube_nod
                i,entry,queue_entry(&queue), rate, search_depth);
       }
     }
+
     get_stream_state_cpu(&cpu_state);
     for(i = 0 ; i < N_CPU_STREAM; i ++){
       if(cpu_state.stream_state_array[i] == STREAM_STATE_READY){
@@ -693,7 +697,9 @@ int32_t two_phase_search_tree(coord_cube_ptr cube, search_node_cube_ptr cube_nod
         }
       }
     }
+#endif
   }
+
 SYNC:;
   sync_all_stream();
   //get_stream_state(&state);
@@ -705,6 +711,7 @@ SYNC:;
       }
     }
   }
+#if(N_CPU_STREAM)
   sync_all_stream_cpu();
   for(i = 0 ; i < N_CPU_STREAM; i ++){
     if(enq_flag_cpu [i] && !ret){
@@ -716,6 +723,7 @@ SYNC:;
   }
   stop_phase2_worker();
 
+#endif
   t3 = omp_get_wtime();
 
   free_queue(&queue);
