@@ -1,12 +1,8 @@
 #ifndef __CUDA_SOLVER_H__
 #define __CUDA_SOLVER_H__
-
-
-#define N_GPU 2
+#include"solver_settings.h"
 
 #define N_STREAM (N_GPU * 2)
-
-
 #define STREAM_STATE_READY 0
 #define STREAM_STATE_BUSY 1
 

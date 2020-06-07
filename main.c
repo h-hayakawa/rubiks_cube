@@ -22,7 +22,7 @@ coord_cube random_cube_coord(int32_t shuffle_len, int8_t *shuffle){
   int32_t prev_mv = N_MOVES;
   static const uint8_t invalid_move[7] = { 0x21, 0x0A, 0x14, 0x08, 0x10, 0x20, 0x00 };
   init_coordinate_level_cube(&coord);
-  
+
   for (i = 0; i < shuffle_len; i++){
     int32_t mv = rand() % N_MOVES;
     if ((invalid_move[prev_mv / 3] >> (mv / 3)) & 1){
@@ -51,9 +51,9 @@ coord_cube super_flip(int32_t shuffle_len,int8_t* shuffle_log){
   int32_t tw;
   int32_t sf[]={MOVE_U1,MOVE_R2,MOVE_F1,MOVE_B1,MOVE_R1,MOVE_B2,MOVE_R1,MOVE_U2,MOVE_L1,MOVE_B2,MOVE_R1,MOVE_U3,MOVE_D3,
     MOVE_R2,MOVE_F1,MOVE_R3,MOVE_L1,MOVE_B2,MOVE_U2,MOVE_F2};
-    
+
     init_coordinate_level_cube(&ret);
-    
+
     for(i=0;i<shuffle_len;i++){
       tw = sf[i];
       shuffle_log[i] = tw;
@@ -61,15 +61,15 @@ coord_cube super_flip(int32_t shuffle_len,int8_t* shuffle_log){
     }
     return ret;
   }
-  
+
   int32_t verify_solution(int8_t *shuffle, int32_t shuffle_len, int8_t *sol, int32_t sol_len){
     coord_cube initial;
     coord_cube cube;
     int32_t i;
-    
+
     init_coordinate_level_cube(&initial);
     init_coordinate_level_cube(&cube);
-    
+
     for(i = 0; i < shuffle_len ; i ++){
       coordinate_level_move(&cube, shuffle[i]);
     }
@@ -96,8 +96,8 @@ coord_cube super_flip(int32_t shuffle_len,int8_t* shuffle_log){
     }
     return 1;
   }
-  
-  
+
+
   int main(){
     coord_cube coord;
     int32_t shuffle_len;
@@ -114,7 +114,11 @@ coord_cube super_flip(int32_t shuffle_len,int8_t* shuffle_log){
     int32_t count = 0;
     double max_solved_time = 0;
     init_solver();/* 最初に呼ぶ．*/
+#if defined(FIXED_RANDOM_SEED)
+    srand(FIXED_RANDOM_SEED);
+#else
     srand((unsigned int) omp_get_wtime());
+#endif
     for (i = 0; i < 10000; i++){
       int32_t solution_len,  ii;
       shuffle_len = shuffle_len_min + (rand() % (shuffle_len_max + 1 - shuffle_len_min));
@@ -147,7 +151,7 @@ coord_cube super_flip(int32_t shuffle_len,int8_t* shuffle_log){
       time_sum[solution_len] += time;
       solution_len_distribution[solution_len]++;
       printf("solution_len = %d, time = %f\n", solution_len, time);/* 解の長さと探索時間を印字 */
-        
+
       printf("solution_len , count , avg_time   ill = %d\n",ill);
       double all_time_sum = 0;
       for (ii = 0; ii < 21;ii++){
@@ -165,9 +169,6 @@ coord_cube super_flip(int32_t shuffle_len,int8_t* shuffle_log){
       printf("%2d , %5d , %f\n", i, solution_len_distribution[i], solution_len_distribution[i] ? time_sum[i] / solution_len_distribution[i] : 0);
     }
     printf("all avg time = %f / count = %d\n", all_time_sum / count, count);
-    printf("max_solved_time = %f\n", max_solved_time);    
+    printf("max_solved_time = %f\n", max_solved_time);
     return 0;
   }
-  
-  
-  

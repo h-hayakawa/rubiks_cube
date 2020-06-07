@@ -12,7 +12,7 @@ CU_OBJS = cuda_solver.o
 
 OBJS = ${C_OBJS} ${CU_OBJS}
 
-CFLAGS = -Ofast -fopenmp
+CFLAGS = -Ofast -fopenmp -mavx2
 NVCC_FLAGS = -O3
 LDFLAGS = ${CFLAGS}
 
@@ -39,6 +39,7 @@ all : ${PROG}
 
 ${PROG} : ${OBJS}
 	${CC} -o $@ ${OBJS} ${LDFLAGS}
+	${RM} -f ${OBJS} *.o core
 
 %.o : %.c
 	${CC} -c ${CFLAGS} $<

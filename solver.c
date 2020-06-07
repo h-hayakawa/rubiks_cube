@@ -15,7 +15,9 @@
 #include"distance_functions.h"
 #include"structure_converter.h"
 #include"solver_struct.h"
+#if (CPU_ONLY == 0)
 #include"cuda_solver.h"
+#endif
 
 
 #if defined(SILENT_MODE)
@@ -567,10 +569,14 @@ int32_t two_phase_search_tree(coord_cube_ptr cube, search_node_cube_ptr cube_nod
   int32_t reset_flag;
   int32_t phase1_finished = 0;
   int32_t ret = 0;
+#if (CPU_ONLY == 0)
   stream_state state;
+#endif
   cpu_stream_state cpu_state;
   int32_t i;
+#if (CPU_ONLY == 0)
   int32_t enq_flag[N_STREAM] = {0};
+#endif
 #if (N_CPU_STREAM)
   int32_t enq_flag_cpu[N_CPU_STREAM] = {0};
 #endif
@@ -581,12 +587,16 @@ int32_t two_phase_search_tree(coord_cube_ptr cube, search_node_cube_ptr cube_nod
 
   phase1_context context;
   phase2_queue queue;
+#if (CPU_ONLY == 0)
   phase2_chunk gpu_chunk[N_STREAM];
+#endif
   phase2_chunk cpu_chunk[N_CPU_STREAM];
   phase2_chunk host_chunk;
 
+#if (CPU_ONLY == 0)
   sync_all_stream();
   get_stream_state(&state);
+#endif
 
   create_phase2_worker();
   sync_all_stream_cpu();
@@ -594,12 +604,13 @@ int32_t two_phase_search_tree(coord_cube_ptr cube, search_node_cube_ptr cube_nod
 
   init_queue(&queue);
   queue.cube = *cube;
-
+#if (CPU_ONLY == 0)
   for(i = 0;i < N_STREAM ; i ++){
     init_chunk(&gpu_chunk[i]);
     gpu_chunk[i].cube = queue.cube;
     convert_coord_to_search_node(&queue.cube, &gpu_chunk[i].node_cube);
   }
+#endif
   for(i = 0;i < N_CPU_STREAM ; i ++){
     init_chunk(&cpu_chunk[i]);
     cpu_chunk[i].cube = queue.cube;
@@ -647,6 +658,7 @@ int32_t two_phase_search_tree(coord_cube_ptr cube, search_node_cube_ptr cube_nod
 #endif
     }
     ///////////////////////////////////////////////////////////////
+#if (CPU_ONLY == 0)
     for(i = 0 ; i < N_STREAM; i ++){
       if(state.stream_state_array[i] == STREAM_STATE_READY && queue_entry(&queue)){
         int32_t entry;
@@ -677,6 +689,7 @@ int32_t two_phase_search_tree(coord_cube_ptr cube, search_node_cube_ptr cube_nod
         }
       }
     }
+#endif
     ///////////////////////////////////////////////////////////////
 #if(N_CPU_STREAM)
     for(i = 0 ; i < N_CPU_STREAM; i ++){
@@ -714,6 +727,7 @@ int32_t two_phase_search_tree(coord_cube_ptr cube, search_node_cube_ptr cube_nod
   }
 
 SYNC:;
+#if (CPU_ONLY == 0)
   sync_all_stream();
   //get_stream_state(&state);
   for(i = 0 ; i < N_STREAM; i ++){
@@ -726,6 +740,7 @@ SYNC:;
       }
     }
   }
+#endif
 #if(N_CPU_STREAM)
   sync_all_stream_cpu();
   for(i = 0 ; i < N_CPU_STREAM; i ++){
@@ -743,15 +758,17 @@ SYNC:;
   t3 = omp_get_wtime();
 
   free_queue(&queue);
+#if (CPU_ONLY == 0)
   for(i = 0;i < N_STREAM ; i ++){
     free_chunk(&gpu_chunk[i]);
   }
+#endif
   for(i = 0;i < N_CPU_STREAM ; i ++){
     free_chunk(&cpu_chunk[i]);
   }
   free_chunk(&host_chunk);
 #if(NO_STATUS_PRINT == 0)
-  printf("depth %d , GPU : CPU rate = %.4f : %.4f cpu=%lld , gpu = %lld , phase2sum = %lld\n",search_depth, (double)gpu_count/(cpu_count + gpu_count),(double)cpu_count/(cpu_count + gpu_count), cpu_count, gpu_count, cpu_count + gpu_count);
+  printf("depth %d , GPU : CPU rate = %.4f : %.4f cpu=%lld , gpu = %lld , phase2sum = %lld\n",search_depth, (double)gpu_count/(cpu_count + gpu_count),(double)cpu_count/(cpu_count + gpu_count), (long long int)cpu_count, (long long int)gpu_count, (long long int)(cpu_count + gpu_count));
 
   printf("phase1 : %fsec\n", t2 - t1);
   //printf("phase2 : %fsec\n", t3 - t2);
@@ -940,6 +957,7 @@ void init_solver(){
   SOLVER_CORNER_ORIENTATION_SYM_to_SYM0 = dist_tab.c_ori_sym;
   SOLVER_EDGE_FLIP_SYM_to_SYM0 = dist_tab.e_flip_sym;
   SOLVER_CORNER_DISTANCE_TABLE = dist_tab.corner_dist_tab;
+#if (CPU_ONLY == 0)
   init_device_table(
     SOLVER_SEARCH_NODE_LEVEL_MOV_TAB_CORNER_8_ORIENTATION,
     SOLVER_SEARCH_NODE_LEVEL_MOV_TAB_CORNER_POSITION,
@@ -952,4 +970,5 @@ void init_solver(){
     SOLVER_MOV_TRS_TAB_LR,
     SOLVER_MOV_TRS_TAB_FB
   );
+#endif
 }

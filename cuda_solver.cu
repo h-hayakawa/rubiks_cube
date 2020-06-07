@@ -6,6 +6,7 @@
 #include"solver_struct.h"
 #include"cuda_solver.h"
 
+#if (N_GPU > 0)
 
 uint16_t *CUDA_SOLVER_SEARCH_NODE_LEVEL_MOV_TAB_CORNER_8_ORIENTATION[N_STREAM/2] = {NULL};//76.9KB
 uint16_t *CUDA_SOLVER_SEARCH_NODE_LEVEL_MOV_TAB_EDGE_12_FLIP[N_STREAM/2] = {NULL};//72.0KB
@@ -383,3 +384,5 @@ void init_device_table(
     HANDLE_ERROR(cudaStreamCreate(&STREAM[i]));
   }
 }
+
+#endif

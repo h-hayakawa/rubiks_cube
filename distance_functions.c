@@ -194,7 +194,7 @@ static void create_corner_distance_table(uint8_t **dst, int64_t entry){
   loop_flag = 1;
   depth = 0;
   while (loop_flag){
-    printf("depth = %2d , count = %10lld   %10lld\n", depth, count, count - prev_ct);
+    printf("depth = %2d , count = %10lld   %10lld\n", depth, (long long int)count, (long long int)(count - prev_ct));
     prev_ct = count;
     loop_flag = 0;
     for (i = 0; i < entry; i++){
@@ -203,7 +203,7 @@ static void create_corner_distance_table(uint8_t **dst, int64_t entry){
         int32_t mov;
         int64_t src_index;
         src_index = i;
-        
+
         if (!index_to_node_corner(src_index, &node)){
           continue;
         }
@@ -217,7 +217,7 @@ static void create_corner_distance_table(uint8_t **dst, int64_t entry){
             count++;
           }
         }
-        
+
       }
     }
     depth++;
@@ -252,7 +252,7 @@ static void create_distance_table(uint8_t **dst, int64_t entry){
   loop_flag = 1;
   depth = 0;
   while (loop_flag){
-    printf("depth = %2d , count = %10lld   %10lld\n", depth, count, count - prev_ct);
+    printf("depth = %2d , count = %10lld   %10lld\n", depth, (long long int)count, (long long int)(count - prev_ct));
     prev_ct = count;
     loop_flag = 0;
     for (i = 0; i < entry; i++){
@@ -308,10 +308,10 @@ static void load_tab(FILE *fp, uint8_t **tab, int64_t entry){
       for (j = 0; j < read_count; i++, j++){
         dst[i] = buffer[j];
       }
-    }    
+    }
     *tab = dst;
   }
-  
+
 
 void init_distance_table(){
   static const char *filename = DISTANCE_TABLE_FILE_PATH;
