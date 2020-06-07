@@ -1,4 +1,4 @@
-#ifndef __SOLVER_STRUCT_H__ 
+#ifndef __SOLVER_STRUCT_H__
 #define __SOLVER_STRUCT_H__
 #include<stdint.h>
 #include"cube_structures.h"
@@ -36,13 +36,14 @@ typedef struct __search_node__{
 
 #if defined(P_THREAD)
 /* PHASE_2_CUBE_QUEUE_SIZEのサイズがでかすぎるとmallocが死ぬ */
-//#define PHASE_2_CUBE_QUEUE_SIZE        (0x60000000)
-#define PHASE_2_CUBE_QUEUE_SIZE        (0x06000000)
+#define PHASE_2_CUBE_QUEUE_SIZE        (0x30000000)
+//#define PHASE_2_CUBE_QUEUE_SIZE        (0x06000000)
 #define PHASE_1_SEARCH_CHUNK_SIZE      (0x00020000)
-#define PHASE_2_SEARCH_CHUNK_SIZE_CPU  (0x00002000)
+#define PHASE_2_SEARCH_CHUNK_SIZE_CPU  (0x00001000)
+#define PHASE_2_SEARCH_CHUNK_SIZE_GPU  (0x00100000)
 #define PHASE_2_SEARCH_CHUNK_SIZE_HOST (0x00000800)
 #define PHASE2_SEARCH_DEPTH 11
-#define BLOCK_DIM (128)
+#define BLOCK_DIM (1024)
 #endif
 
 #define TWO_PHASE_SEARCH_SWITCH_DEPTH 13
