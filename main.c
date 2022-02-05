@@ -119,11 +119,11 @@ coord_cube super_flip(int32_t shuffle_len,int8_t* shuffle_log){
 #else
     srand((unsigned int) omp_get_wtime());
 #endif
-    for (i = 0; i < 1; i++){
+    for (i = 0; i < 1000; i++){
       int32_t solution_len,  ii;
       shuffle_len = shuffle_len_min + (rand() % (shuffle_len_max + 1 - shuffle_len_min));
-      //coord = random_cube_coord(shuffle_len, shuffle);
-      coord = super_flip(shuffle_len = 20, shuffle);
+      coord = random_cube_coord(shuffle_len, shuffle);
+      //coord = super_flip(shuffle_len = 20, shuffle);
       printf("shuffle moves = ");
       print_move(shuffle, shuffle_len);/* シャッフル手順を印字 */
       t1 = omp_get_wtime();
