@@ -1,7 +1,7 @@
 #include<stdio.h>
 #include<stdlib.h>
-#include<helper_cuda.h>
-#include<helper_timer.h>
+//#include<helper_cuda.h>
+//#include<helper_timer.h>
 #include"move_defines.h"
 #include"solver_struct.h"
 #include"cuda_solver.h"

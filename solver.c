@@ -486,6 +486,7 @@ void *phase2_worker(void * thread_prm){
     }
     usleep(1);
   }
+  return 0;
 }
 
 void create_phase2_worker(){
