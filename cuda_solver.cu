@@ -1,7 +1,7 @@
 #include<stdio.h>
 #include<stdlib.h>
-#include<helper_cuda.h>
-#include<helper_timer.h>
+//#include<helper_cuda.h>
+//#include<helper_timer.h>
 #include"move_defines.h"
 #include"solver_struct.h"
 #include"cuda_solver.h"
@@ -18,7 +18,7 @@ __constant__ uint8_t CUDA_SOLVER_MOV_TRS_TAB_FB[N_MOVES];
 uint8_t *CUDA_SOLVER_DISTANCE_TABLE[N_STREAM/2] = {NULL};
 uint8_t *CUDA_SOLVER_CORNER_DISTANCE_TABLE[N_STREAM/2] = {NULL};
 
-uint16_t *CUDA_SOLVER_CORNER_ORIENTATION_SYM_to_SYM0[N_STREAM/2] = {NULL};
+uint16_t __restrict__ *CUDA_SOLVER_CORNER_ORIENTATION_SYM_to_SYM0[N_STREAM/2] = {NULL};
 __constant__ uint16_t CUDA_SOLVER_EDGE_FLIP_SYM_to_SYM0[N_EDGE_FLIP * N_SYM];
 __constant__ uint8_t D_INVALID_MOVE[7];
 
@@ -66,7 +66,7 @@ void search_tree_phase2_cuda_karnel(
   uint16_t *d_edge_12flip_mov_table,
   uint8_t *d_distance_table,
   uint8_t *d_corner_distance_table,
-  uint16_t *corner_ori_sym
+  uint16_t __restrict__ *corner_ori_sym
 ){
   int32_t i;
   uint32_t mh,ml;
